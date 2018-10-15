@@ -53,9 +53,9 @@
     </pluginRepositories>
 
     <scm>
-        <connection>scm:git:https://github.com/sanjbh/camel-gke</connection>
+        <connection>scm:git:https://github.com/sanjbh/${project.artifactId}</connection>
         <url>https://github.com/sanjbh/camel-gke</url>
-        <developerConnection>scm:git:https://github.com/sanjbh/camel-gke</developerConnection>
+        <developerConnection>scm:git:https://github.com/sanjbh/${project.artifactId}</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
