@@ -22,8 +22,42 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <spring-cloud.version>Finchley.SR1</spring-cloud.version>
+        <version.number>${git.commit.id.abbrev}</version.number>
+        <nexus.server>nexus-service.nexus</nexus.server>
+        <gcr.region.name>${env.regionName}</gcr.region.name>
+        <gcp.project.name>${env.projectName}</gcp.project.name>
     </properties>
 
+
+    <repositories>
+        <repository>
+            <id>nexus</id>
+            <!--<url>http://nexus:8081/nexus/content/groups/maven_group/</url>-->
+            <url>http://${nexus.server}/repository/maven-public/</url>
+        </repository>
+    </repositories>
+
+
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>nexus</id>
+            <url>http://${nexus.server}/repository/maven-public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <scm>
+        <connection>scm:git:https://github.com/sanjbh/camel-gke</connection>
+        <url>https://github.com/sanjbh/camel-gke</url>
+        <developerConnection>scm:git:https://github.com/sanjbh/camel-gke</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 
 
     <dependencyManagement>
@@ -131,10 +165,74 @@
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}-${git.commit.id.abbrev}</finalName>
+        <extensions>
+            <extension>
+                <groupId>com.gkatzioura.maven.cloud</groupId>
+                <artifactId>google-storage-wagon</artifactId>
+                <version>1.0</version>
+            </extension>
+        </extensions>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.4.11</version>
+                <configuration>
+                    <imageName>${gcr.region.name}/${gcp.project.name}/${project.artifactId}:${project.version}</imageName>
+                    <!--<imageName>${project.artifactId}:${project.version}</imageName>-->
+                    <dockerDirectory>src/main/docker</dockerDirectory>
+                    <buildArgs>
+                        <finalName>${project.build.finalName}.jar</finalName>
+                    </buildArgs>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>2.2.4</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <dateFormat>yyyyMMdd-HHmmss</dateFormat>
+                    <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+                    <generateGitPropertiesFile>false</generateGitPropertiesFile>
+                    <injectallreactorprojects>true</injectallreactorprojects>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>1.10.0</version>
+                <configuration>
+                    <connectionType>connection</connectionType>
+                    <tag>${project.artifactId}-${project.version}</tag>
+                    <basedir>${project.basedir}</basedir>
+                </configuration>
             </plugin>
         </plugins>
     </build>
