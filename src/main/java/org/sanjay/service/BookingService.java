@@ -21,8 +21,8 @@ public class BookingService {
     public BookingResponse doBooking(BookingRequest bookingRequest) throws CamelApplicationException {
         Object response = null;
 
-        logger.info("Received data for booking. Invoking Camel route");
         response = producerTemplate.sendBody("direct:doBooking", ExchangePattern.InOut, bookingRequest);
+
         if (response instanceof CamelApplicationException) {
             logger.error("We have an exception");
             String message = ((CamelApplicationException) response).getMessage();
