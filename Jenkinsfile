@@ -10,7 +10,7 @@ pipeline {
     }
 
     agent {
-        label 'jenkins-k8s-slave-label'
+        label 'image-builder'
     }
 
     stages {       
@@ -19,7 +19,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'gcr-secrets-file', variable: 'GC_KEY'), 
                                  file(credentialsId: 'maven-settings-xml-secret', variable: 'MVN_SETTINGS_XML')])  {
-                    container('custom-jenkins-slave') {
+                    container('application-image-builder') {
                         sh '''
                             mvn versions:set -DnewVersion=${commitId} -s ${MVN_SETTINGS_XML}
                             mvn clean package docker:build -s ${MVN_SETTINGS_XML}
