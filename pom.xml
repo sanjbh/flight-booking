@@ -23,7 +23,7 @@
         <java.version>1.8</java.version>
         <spring-cloud.version>Finchley.SR1</spring-cloud.version>
         <version.number>${git.commit.id.abbrev}</version.number>
-        <nexus.server>nexus-service.nexus</nexus.server>
+        <nexus.server>nexus-sonatype-nexus.nexus</nexus.server>
         <gcr.region.name>${env.regionName}</gcr.region.name>
         <gcp.project.name>${env.projectName}</gcp.project.name>
     </properties>
